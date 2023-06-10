@@ -9,6 +9,9 @@ The instancer uses two main threads:
 - One to accept new connections to the server, and assign internal ports to them.
 - One to prune existing connections to the server, and free up internal ports.
 
+On the backend, the instancer uses a thread-per-connection system. By default, each thread spins up its own Docker container.
+When ports / memory needs to be reclaimed, the oldest threads are culled, and a cleanup function spins down the container.
+
 Out of the box, the instancer uses the following authentication scheme:
 - The client first has to send a 130 byte message.
 - The first 128 bytes are the authentication token, and the last 2 bytes are the identifier.
@@ -18,8 +21,11 @@ Out of the box, the instancer uses the following authentication scheme:
 
 This authenication functionality can be extended by modifying the auth.py file.
 
+## Challenge server
+The challenge server is containerized with Docker. Build the Docker image then start up a new container using `docker compose up` (in start_cmd.sh)
+
 ## Todo
 - Add proof-of-work system to prevent excessive connections
 - Add ability to blacklist IPs
 - Create docker setup, with read only filesystem and setuid binary for internal server
-- Dockerise internal server to isolate any exploits run on it.
+- Dockerise internal server to isolate any exploits run on it. Use Docker API for this.

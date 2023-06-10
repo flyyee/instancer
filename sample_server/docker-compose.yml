@@ -1,0 +1,6 @@
+services:
+  chall:
+    build: .
+    ports:
+      - "${APP_PORT}:1337"
+    privileged: true

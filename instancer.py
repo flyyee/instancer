@@ -8,8 +8,6 @@ from dataclasses import dataclass
 from utils import stop_process, check_port_avail
 from auth import auth, tokens_associated
 
-# from typing import List, Tuple
-
 
 @dataclass
 class Instance:
@@ -30,7 +28,8 @@ MAX_TIMEOUT = 20  # 20 seconds
 
 def handle_connection(client_socket, port, use_existing_instance=False):
     if not use_existing_instance:
-        start_cmd = f"python3 server.py {port}"  # TODO: drop privileges in running this! ie use setuid binary
+        # start_cmd = f"python3 sample_server/server.py {port}"  # TODO: drop privileges in running this! ie use setuid binary
+        start_cmd = f"./start_cmd.sh {port}"  # TODO: drop privileges in running this! ie use setuid binary
         subprocess.Popen(start_cmd.split(" "), stdout=subprocess.DEVNULL)
         time.sleep(1)  # wait for server to start up
 
@@ -82,6 +81,7 @@ def prune_connection(client_socket, port):
     else:
         waiting_ports.insert(0, port)
 
+
 lock = threading.Lock()
 
 
@@ -102,6 +102,7 @@ def handle_incoming_connections(proxy_server: socket.socket):
                     for instance in instances:
                         if tokens_associated(instance.token, token):
                             print(f"[~] Resetting instance {instance=}")
+                            # TODO: make the following a function. Also, cleanup any remaining Docker containers.
                             instances.remove(instance)
                             instance.process.kill()
                             prune_connection(instance.client_socket, instance.port)
